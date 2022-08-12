@@ -627,7 +627,35 @@ def onmessage(update,bot:ObigramClient):
                 bot.sendMessage(update.message.chat.id,'Se eliminaron los archivos en un rango de 50')
             except:
                 bot.sendMessage(update.message.chat.id,'No se pudieron eliminar 50 elementos solo se eliminaron '+str(eliminados))
-	        ###################################################################
+        elif '/delete' in msgText:
+           try: 
+            enlace = msgText.split('/delete')[-1]
+            proxy = ProxyCloud.parse(user_info['proxy'])
+            client = MoodleClient(user_info['moodle_user'],
+                                   user_info['moodle_password'],
+                                   user_info['moodle_host'],
+                                   user_info['moodle_repo_id'],
+                                   proxy=proxy)
+            loged= client.login()
+            if loged:
+                #update.message.chat.id
+                deleted = client.delete(enlace)
+
+                bot.sendMessage(update.message.chat.id, "Archivo eliminado con exito...")
+            else: bot.sendMessage(update.message.chat.i, "No se pudo loguear")            
+           except: bot.sendMessage(update.message.chat.id, "No se pudo eliminar el archivo")
+        elif '/download' in msgText:
+           try:
+            getUser = user_info
+            rename = getUser['rename'] 
+            url = msgText.split(" ")[1]
+            ddl(update,bot,message,url,file_name='',thread=thread,jdb=jdb,username=username)
+           except Exception as ex:
+            bot.editMessageText(message,"Error al intentar bajar el archivo"+str(ex))
+    except Exception as ex:
+           print(str(ex))
+           bot.sendMessage(update.message.chat.id,str(ex))
+       ###################################################################
        
         elif '/delete_config' in msgText:
             getUser = user_info
@@ -766,35 +794,6 @@ def onmessage(update,bot:ObigramClient):
             statInfo = infos.createStat(username,getUser,jdb.is_admin(username))
             bot.editMessageText(message,"✅Configuracion de Aula Guantanamo cargada")
         ###################################################
-
-        elif '/delete' in msgText:
-           try: 
-            enlace = msgText.split('/delete')[-1]
-            proxy = ProxyCloud.parse(user_info['proxy'])
-            client = MoodleClient(user_info['moodle_user'],
-                                   user_info['moodle_password'],
-                                   user_info['moodle_host'],
-                                   user_info['moodle_repo_id'],
-                                   proxy=proxy)
-            loged= client.login()
-            if loged:
-                #update.message.chat.id
-                deleted = client.delete(enlace)
-
-                bot.sendMessage(update.message.chat.id, "Archivo eliminado con exito...")
-            else: bot.sendMessage(update.message.chat.i, "No se pudo loguear")            
-           except: bot.sendMessage(update.message.chat.id, "No se pudo eliminar el archivo")
-        elif '/download' in msgText:
-           try:
-            getUser = user_info
-            rename = getUser['rename'] 
-            url = msgText.split(" ")[1]
-            ddl(update,bot,message,url,file_name='',thread=thread,jdb=jdb,username=username)
-           except Exception as ex:
-            bot.editMessageText(message,"Error al intentar bajar el archivo"+str(ex))
-    except Exception as ex:
-           print(str(ex))
-           bot.sendMessage(update.message.chat.id,str(ex))
 
 def cancel_task(update,bot:ObigramClient):
     try:
